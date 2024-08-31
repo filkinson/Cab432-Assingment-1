@@ -14,14 +14,18 @@ const Home = () => {
 
   return (
     <div className="container">
-      {videos.map((video, index) => (
-        <div key={index}>
-          <video width="600" controls className='video'>
-            <source src={`http://localhost:5000/${video}`} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      ))}
+      {videos.length === 0 ? (
+        <p>No videos available</p> // Message to display when there are no videos
+      ) : (
+        videos.map((video, index) => (
+          <div key={index}>
+            <video width="600" controls className='video'>
+              <source src={`http://localhost:5000/${video}`} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        ))
+      )}
     </div>
   );
 };

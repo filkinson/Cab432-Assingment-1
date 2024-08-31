@@ -9,10 +9,13 @@
     left: 0;
     right: 0;
     margin: auto;
-    max-height: 85vh; /* Adjusts the maximum height to allow scrolling */
+    height: 85vh; /* Adjusts the maximum height to allow scrolling */
     overflow-y: auto; /* Adds a vertical scrollbar when content overflows */
 }
 
+.container p {
+    color: white;
+}
 /* Custom Scrollbar for WebKit Browsers */
 .container::-webkit-scrollbar {
     width: 12px; /* Width of the entire scrollbar */

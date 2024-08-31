@@ -27,7 +27,7 @@ const VideoUploader = () => {
 
     const formData = new FormData();
     formData.append('video', file);
-
+    formData.append('sessionToken', token);
     try {
       const response = await axios.post('http://localhost:5000/upload', formData, {
         headers: {
