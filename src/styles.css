@@ -1,0 +1,85 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial;
+}
+
+.background {
+    background: url("home-background.jpg");
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    height: 90vh;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+}
+
+body {
+    margin: 0; 
+}
+
+.nav {
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    align-items: stretch;
+    gap: 2rem;
+    padding: 0 1rem;
+}
+
+.nav ul, .nav button {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1rem;
+    list-style: none; /* Applies to ul, but has no effect on button */
+}
+
+.nav button {
+    background: none; /* Removes default button background */
+    border: none; /* Removes default button border */
+    cursor: pointer; /* Changes cursor to pointer on hover */
+    font-size: inherit; /* Adjust to match .nav a and .nav li */
+    color: inherit; /* Inherit text color from .nav */
+}
+
+.nav a {
+    color: inherit;
+    font-size: 2rem;
+    text-decoration: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: .25rem;
+}
+
+.nav li {
+    color: inherit;
+    font-size: 2rem;
+    text-decoration: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: .25rem;
+}
+
+.nav li.active {
+    background-color: #555;
+}
+
+.nav li:hover {
+    background-color: #777;
+    cursor: pointer;
+}
+
+.foot {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+
