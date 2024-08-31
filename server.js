@@ -145,6 +145,58 @@ app.delete('/api/delete-video', (req, res) => {
   });
 });
 
+// Endpoint for video transcoding
+app.post('/transcode', upload.single('video'), (req, res) => {
+  const token = req.body.sessionToken;
+  if (!token) {
+    return res.status(400).json({ message: 'Session token is required' });
+  }
+
+  const inputPath = path.join(__dirname, 'uploads', req.file.filename);
+  const outputFilename = `${Date.now()}.mp4`;
+  const outputPath = path.join(__dirname, 'uploads', outputFilename);
+
+  ffmpeg(inputPath)
+    .output(outputPath)
+    .videoCodec('libx264')
+    .on('end', () => {
+      // Remove the original file after transcoding
+      fs.unlink(inputPath, (err) => {
+        if (err) console.error('Error deleting original video file:', err);
+      });
+
+      const videoUrl = `http://localhost:5000/${outputFilename}`; // URL of the transcoded video
+
+      // Update the user's record with the new video
+      fs.readFile(usersFile, 'utf8', (err, data) => {
+        if (err) {
+          return res.status(500).json({ message: 'Server error' });
+        }
+
+        const users = JSON.parse(data || '[]');
+        const userIndex = users.findIndex(user => user.token === token);
+
+        if (userIndex === -1) {
+          return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        users[userIndex].videos = [...(users[userIndex].videos || []), outputFilename];
+
+        fs.writeFile(usersFile, JSON.stringify(users), 'utf8', (err) => {
+          if (err) {
+            return res.status(500).json({ message: 'Server error' });
+          }
+          res.json({ videoUrl });
+        });
+      });
+    })
+    .on('error', (err) => {
+      console.error('Error during transcoding:', err);
+      res.status(500).json({ message: 'Transcoding failed' });
+    })
+    .run();
+});
+
 // Endpoint to register a new user
 app.post('/register', (req, res) => {
   const { email, password } = req.body;

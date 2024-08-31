@@ -32,6 +32,7 @@ export default function Navbar() {
         <CustomLink to="/">Home</CustomLink>
         {token && <CustomLink to="/myvideos">My Videos</CustomLink>}
         {token && <CustomLink to="/videouploader">Upload Videos</CustomLink>}
+        {token && <CustomLink to="/transcodevideo">Transcode Videos</CustomLink>}
         {!token ? (
           <>
             <CustomLink to="/login">Login</CustomLink>
