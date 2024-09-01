@@ -10,3 +10,25 @@
     right: 0;
     margin: auto;
 }
+
+.transcodeVideoContainer button {
+    border: none;
+    background-color: #003468;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 200px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+  
+  .transcodeVideoContainer button:hover {
+    background-color: #405469;
+  }
+
+  .transcodeVideoContainer p {
+    color: #fff;
+    margin: 15px;
+  }

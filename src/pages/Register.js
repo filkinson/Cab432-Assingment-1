@@ -7,67 +7,65 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
       setError('Password and Confirm Password do not match');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
+      resetForm();
       return;
     }
 
-    const url = 'http://localhost:5000/register'; // Update to your server URL
-
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setSuccess(data.message);
-        setError('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-      })
-      .catch((error) => {
-        console.error('Error during registration:', error);
-        if (error.message === 'Conflict') {
-          setError('Email is already in use');
-        } else {
-          setError('An error occurred during registration');
-        }
-        setSuccess('');
+    try {
+      const response = await fetch(`${apiBaseUrl}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
+
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const data = await response.json();
+      setSuccess(data.message);
+      resetForm();
+    } catch (error) {
+      console.error('Error during registration:', error);
+      if (error.message === 'Conflict') {
+        setError('Email is already in use');
+      } else {
+        setError('An error occurred during registration');
+      }
+      setSuccess('');
+    }
+  };
+
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
   };
 
   return (
     <div className={styles.background}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div>
-          <label htmlFor="email"></label>
           <input
-            type="text"
+            type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="off"
             placeholder="Email"
+            required
           />
         </div>
         <div>
-          <label htmlFor="password"></label>
           <input
             type="password"
             id="password"
@@ -75,10 +73,10 @@ export default function Register() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="off"
             placeholder="Password"
+            required
           />
         </div>
         <div>
-          <label htmlFor="confirmPassword"></label>
           <input
             type="password"
             id="confirmPassword"
@@ -86,6 +84,7 @@ export default function Register() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             autoComplete="off"
             placeholder="Confirm Password"
+            required
           />
         </div>
         {error && !success && <div className={styles.error}>* {error}</div>}

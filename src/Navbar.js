@@ -6,7 +6,7 @@ export default function Navbar() {
   const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
-    // Update state when sessionStorage changes
+    // Function to handle changes in sessionStorage
     const handleStorageChange = () => {
       setToken(sessionStorage.getItem('sessionToken'));
     };
@@ -14,14 +14,15 @@ export default function Navbar() {
     // Add event listener to handle storage changes
     window.addEventListener('storage', handleStorageChange);
 
-    // Cleanup the event listener on component unmount
+    // Cleanup event listener on component unmount
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
+  // Handle user logout
   const handleLogout = () => {
-    sessionStorage.removeItem('sessionToken'); // Clear the session token
+    sessionStorage.removeItem('sessionToken'); // Clear session token
     setToken(null); // Update state to trigger re-render
     navigate('/'); // Redirect to home page after logout
   };
@@ -30,9 +31,13 @@ export default function Navbar() {
     <nav className="nav">
       <ul>
         <CustomLink to="/">Home</CustomLink>
-        {token && <CustomLink to="/myvideos">My Videos</CustomLink>}
-        {token && <CustomLink to="/videouploader">Upload Videos</CustomLink>}
-        {token && <CustomLink to="/transcodevideo">Transcode Videos</CustomLink>}
+        {token && (
+          <>
+            <CustomLink to="/myvideos">My Videos</CustomLink>
+            <CustomLink to="/videouploader">Upload Videos</CustomLink>
+            <CustomLink to="/transcodevideo">Transcode Videos</CustomLink>
+          </>
+        )}
         {!token ? (
           <>
             <CustomLink to="/login">Login</CustomLink>
@@ -48,9 +53,11 @@ export default function Navbar() {
   );
 }
 
+// Custom link component for active link styling
 function CustomLink({ to, children }) {
   const resolvedPath = useResolvedPath(to);
   const isActive = useMatch({ path: resolvedPath.pathname, end: true });
+
   return (
     <li className={isActive ? 'active' : ''}>
       <Link to={to}>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import styles from './LoginAndRegister.module.css';
 
 export default function Login() {
@@ -8,43 +8,43 @@ export default function Login() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = 'http://localhost:5000/login'; // Update to your server URL
+    const url = `${apiBaseUrl}/login`;
 
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: username, password: password }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        sessionStorage.setItem('sessionToken', data.token);
-        setSuccess('User logged in successfully');
-        setError('');
-        navigate('/');
-        window.location.reload();        
-      })
-      .catch((error) => {
-        console.error('Error during login:', error);
-        if (error.message === 'Unauthorized') {
-          setError('Incorrect email or password');
-        } else {
-          setError('An error occurred during login');
-        }
-        setSuccess('');
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: username, password: password }),
       });
 
-    setUsername('');
-    setPassword('');
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const data = await response.json();
+      sessionStorage.setItem('sessionToken', data.token);
+      setSuccess('User logged in successfully');
+      setError('');
+      navigate('/'); // Redirect to home page
+      window.location.reload();   
+    } catch (error) {
+      console.error('Error during login:', error);
+      if (error.message === 'Unauthorized') {
+        setError('Incorrect email or password');
+      } else {
+        setError('An error occurred during login');
+      }
+      setSuccess('');
+    } finally {
+      setUsername('');
+      setPassword('');
+    }
   };
 
   return (

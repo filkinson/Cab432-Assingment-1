@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './transcodevideo.css';
 
@@ -6,8 +6,13 @@ const TranscodeVideo = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  
   const navigate = useNavigate();
   const token = sessionStorage.getItem('sessionToken');
+  const fileInputRef = useRef(null);
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   if (!token) {
     navigate('/login');
@@ -15,7 +20,10 @@ const TranscodeVideo = () => {
   }
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+    setFileName(selectedFile ? selectedFile.name : '');
+    setVideoUrl('');
   };
 
   const handleUpload = async () => {
@@ -32,34 +40,54 @@ const TranscodeVideo = () => {
     formData.append('sessionToken', token);
 
     try {
-      const response = await fetch('http://localhost:5000/transcode', {
+      const response = await fetch(`${apiBaseUrl}/transcode`, {
         method: 'POST',
         body: formData,
       });
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to upload video');
+        throw new Error(data.message || 'Failed to transcode video');
       }
 
+      setVideoUrl(`${apiBaseUrl}/${data.videoName}`);
       alert('Video transcoded and uploaded successfully!');
-      navigate('/myvideos');
     } catch (error) {
-      console.error('Error uploading video:', error);
-      setError('Failed to upload video');
+      console.error('Error transcoding video:', error);
+      setError('Failed to transcode video');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <div className="transcodeVideoContainer">
-      <h1>Transcode and Upload Video</h1>
-      <input type="file" accept="video/*" onChange={handleFileChange} />
+      <input
+        type="file"
+        accept="video/*"
+        onChange={handleFileChange}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
+      <button onClick={handleButtonClick}>Choose Video</button>
       <button onClick={handleUpload} disabled={loading}>
-        {loading ? 'Uploading...' : 'Upload'}
+        {loading ? 'Transcoding...' : 'Transcode'}
       </button>
-      {error && <p>{error}</p>}
+      {fileName && <p>Selected File: {fileName}</p>}
+      {error && <p className="error">{error}</p>}
+      {videoUrl && (
+        <div>
+          <video width="600" controls>
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
     </div>
   );
 };

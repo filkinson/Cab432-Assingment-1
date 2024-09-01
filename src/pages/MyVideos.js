@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate  } from 'react-router-dom';
-import "./myvideos.css";
+import { useNavigate } from 'react-router-dom';
+import './myvideos.css';
 
 const MyVideos = () => {
   const [videos, setVideos] = useState([]);
@@ -8,17 +8,17 @@ const MyVideos = () => {
   const [error, setError] = useState('');
   const token = sessionStorage.getItem('sessionToken');
   const navigate = useNavigate();
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
-
     if (!token) {
       navigate('/login');
       return;
     }
-    
+
     const fetchMyVideos = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/myvideos?sessionToken=${token}`);
+        const response = await fetch(`${apiBaseUrl}/api/myvideos?sessionToken=${token}`);
         if (!response.ok) {
           throw new Error('Error fetching videos');
         }
@@ -33,11 +33,11 @@ const MyVideos = () => {
     };
 
     fetchMyVideos();
-  }, [token]);
+  }, [token, navigate, apiBaseUrl]);
 
   const handleDelete = async (filename) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/delete-video?filename=${filename}&sessionToken=${token}`, {
+      const response = await fetch(`${apiBaseUrl}/api/delete-video?filename=${filename}&sessionToken=${token}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -46,9 +46,9 @@ const MyVideos = () => {
       }
       const data = await response.json();
       console.log(data.message);
-  
+
       // Update the state to remove the deleted video
-      setVideos(videos.filter(video => video !== filename));
+      setVideos((prevVideos) => prevVideos.filter(video => video !== filename));
     } catch (error) {
       console.error('Error deleting video:', error);
       setError(error.message || 'Failed to delete video');
@@ -66,12 +66,12 @@ const MyVideos = () => {
   return (
     <div className="myVideosContainer">
       {videos.length === 0 ? (
-        <p>No videos uploaded yet.</p>
+        <p>No videos uploaded yet</p>
       ) : (
         videos.map((video, index) => (
-          <div key={index}>
-            <video width="600" controls className='video'>
-              <source src={`http://localhost:5000/${video}`} type="video/mp4" />
+          <div key={index} className="videoItem">
+            <video width="600" controls >
+              <source src={`${apiBaseUrl}/${video}`} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
             <button onClick={() => handleDelete(video)}>Delete</button>
