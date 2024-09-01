@@ -10,7 +10,6 @@ const ffmpeg = require('fluent-ffmpeg');
 const app = express();
 const port = 5000;
 const usersFile = path.join(__dirname, 'users.json'); // Path to the user data file
-const apiBaseUrl = process.env.REACT_APP_API_URL;
 
 // Middleware
 app.use(cors());
